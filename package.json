@@ -1,0 +1,43 @@
+{
+  "name": "format-number.js",
+  "version": "0.0.0",
+  "description": ".NET style formatting of numbers implemented in JavaScript.",
+  "license": "MIT",
+  "main": "format-number.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:sergeyt/format-number.js.git"
+  },
+  "keywords": [
+    "format"
+  ],
+  "author": "Sergey Todyshev <stodyshev@gmail.com>",
+  "contributors": [
+    "Sergey Todyshev <stodyshev@gmail.com>"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.7.1",
+    "grunt-coffeelint": "0.0.7",
+    "grunt-npm": "~0.0.2",
+    "grunt-bump": "~0.0.7",
+    "grunt-auto-release": "~0.0.2",
+    "grunt-karma": "~0.6.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-simple-mocha": "~0.4.0",
+    "karma": "~0.10.4",
+    "karma-coverage": "0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-script-launcher": "~0.1.0",
+    "karma-coffee-preprocessor": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma-mocha": "~0.1.1",
+    "mocha": "~1.15.1",
+    "should": "~3.1.2"
+  },
+  "scripts": {
+    "lint": "grunt lint",
+    "test": "grunt test"
+  }
+}
