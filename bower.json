@@ -1,0 +1,16 @@
+{
+  "name": "format-number.js",
+  "version": "0.0.1",
+  "main": "format-number.js",
+  "maintainers": [
+    "Sergey Todyshev <stodyshev@gmail.com>"
+  ],
+  "ignore": [
+    ".*",
+    "node_modules",
+    "test",
+    "Gruntfile.coffee",
+    "karma*.js",
+    "package.json"
+  ]
+}
