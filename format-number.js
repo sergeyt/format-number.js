@@ -225,14 +225,14 @@
 		}
 
 		if (precision > 0) {
-			right = formatInfo[ "." ] +
+			right = formatInfo["."] +
 				( (right.length > precision) ? right.slice(0, precision) : rpad(right, precision) );
 		} else {
 			right = "";
 		}
 
 		var stringIndex = numberString.length - 1,
-			sep = formatInfo[ "," ],
+			sep = formatInfo[","],
 			ret = "";
 
 		while (stringIndex >= 0) {
@@ -255,7 +255,7 @@
 	// Custom Format
 
 	function format_custom(value, format, culture) {
-		var sectionInfo = parse_format_sections(value, format);
+		var sectionInfo = find_format_section(value, format);
 		format = sectionInfo.format;
 
 		var positive = true;
@@ -264,10 +264,6 @@
 				positive = false;
 			}
 			value = -value;
-		}
-
-		if (value === 0 && sectionInfo.zero) {
-			format = sectionInfo.zero;
 		}
 
 		var formatInfo = culture.numberFormat;
@@ -287,25 +283,25 @@
 		if (decPointPos < 0) decPointPos = numstr.length;
 
 		var mul = 1;
-		if (info.Percents > 0 && numstr.length > 0) {
-			decPointPos += 2 * info.Percents;
-			mul *= Math.pow(100, info.Percents);
+		if (info.percents > 0 && numstr.length > 0) {
+			decPointPos += 2 * info.percents;
+			mul *= Math.pow(100, info.percents);
 		}
-		if (info.Permilles > 0 && numstr.length > 0) {
-			decPointPos += 3 * info.Permilles;
-			mul *= Math.pow(1000, info.Permilles);
+		if (info.permilles > 0 && numstr.length > 0) {
+			decPointPos += 3 * info.permilles;
+			mul *= Math.pow(1000, info.permilles);
 		}
-		if (info.DividePlaces > 0 && numstr.length > 0) {
-			decPointPos -= info.DividePlaces;
-			mul /= Math.pow(10, info.DividePlaces);
+		if (info.dividePlaces > 0 && numstr.length > 0) {
+			decPointPos -= info.dividePlaces;
+			mul /= Math.pow(10, info.dividePlaces);
 		}
 		if (decPointPos < 0) {
 			decPointPos = -1;
 		}
 
 		var expPositive = true;
-		if (info.UseExponent && (info.DecimalDigits > 0 || info.IntegerDigits > 0)) {
-			var estr = (value * mul).toExponential(info.ExponentDigits);
+		if (info.useExponent && (info.decimalDigits > 0 || info.integerDigits > 0)) {
+			var estr = (value * mul).toExponential(info.exponentDigits);
 			var eindex = numstr.indexOf('e');
 			if (eindex >= 0) {
 				numstr = estr.substr(0, eindex);
@@ -314,7 +310,7 @@
 				if (decPointPos < 0) decPointPos = numstr.length;
 			}
 		} else {
-			var fixed = (value * mul).toFixed(info.DecimalDigits);
+			var fixed = (value * mul).toFixed(info.decimalDigits);
 			if (fixed === 0 || fixed == '0') {
 				positive = true;
 			}
@@ -323,7 +319,7 @@
 			if (decPointPos < 0) decPointPos = numstr.length;
 		}
 
-		if (info.IntegerDigits !== 0 || !(numstr.length === 0 || decPointPos <= 0)) {
+		if (info.integerDigits !== 0 || !(numstr.length === 0 || decPointPos <= 0)) {
 			var count = decPointPos > 0 ? decPointPos : 1;
 			partInt = numstr.substr(0, Math.min(count, numstr.length));
 		}
@@ -331,28 +327,28 @@
 		if (decPointPos < numstr.length)
 			partDec = numstr.substr(decPointPos + 1);
 
-		if (info.UseExponent) {
-			if (info.DecimalDigits <= 0 && info.IntegerDigits <= 0)
+		if (info.useExponent) {
+			if (info.decimalDigits <= 0 && info.integerDigits <= 0)
 				positive = true;
 
-			partInt = lpad(partInt, info.IntegerDigits);
-			partExp = lpad(partExp, info.ExponentDigits - info.ExponentTailSharpDigits);
+			partInt = lpad(partInt, info.integerDigits);
+			partExp = lpad(partExp, info.exponentDigits - info.exponentTailSharpDigits);
 
-			if (expPositive && !info.ExponentNegativeSignOnly)
+			if (expPositive && !info.exponentNegativeSignOnly)
 				partExp = formatInfo["+"] + partExp;
 			else if (!expPositive)
 				partExp = formatInfo["-"] + partExp;
 		} else {
-			partInt = lpad(partInt, info.IntegerDigits - info.IntegerHeadSharpDigits);
-			if (info.IntegerDigits == info.IntegerHeadSharpDigits && is_zero_only(partInt)) {
+			partInt = lpad(partInt, info.integerDigits - info.integerHeadSharpDigits);
+			if (info.integerDigits == info.integerHeadSharpDigits && (/^0*$/).test(partInt)) {
 				partInt = "";
 			}
 		}
 
-		partDec = rtrim_zeros(partDec);
-		partDec = rpad(partDec, info.DecimalDigits - info.DecimalTailSharpDigits);
-		if (partDec.length > info.DecimalDigits)
-			partDec = partDec.substr(0, info.DecimalDigits);
+		partDec = partDec.replace(/0+$/, '');
+		partDec = rpad(partDec, info.decimalDigits - info.decimalTailSharpDigits);
+		if (partDec.length > info.decimalDigits)
+			partDec = partDec.substr(0, info.decimalDigits);
 
 		return format_custom_core(info, format, formatInfo, positive, partInt, partDec, partExp);
 	}
@@ -369,8 +365,8 @@
 		var i;
 
 		var groupSize = formatInfo.groupSizes[0];
-		if (info.UseGroup && partInt.length > groupSize) {
-			partInt = insertSep(partInt, formatInfo[","], groupSize);
+		if (info.useGroup && partInt.length > groupSize) {
+			partInt = insert_sep(partInt, formatInfo[","], groupSize);
 		}
 
 		var length = format.length;
@@ -403,8 +399,7 @@
 							addInt = false;
 						}
 						break;
-					}
-					else if (decimalArea) {
+					} else if (decimalArea) {
 						if (decIndex < partDec.length)
 							result += partDec.charAt(decIndex++);
 						break;
@@ -413,7 +408,7 @@
 					break;
 				case 'e':
 				case 'E':
-					if (!partExp || !info.UseExponent) {
+					if (!partExp || !info.useExponent) {
 						result += c;
 						break;
 					}
@@ -435,7 +430,7 @@
 
 					if (flag1) {
 						i = q - 1;
-						integerArea = info.DecimalPointPos < 0;
+						integerArea = info.decimalPointPos < 0;
 						decimalArea = !integerArea;
 
 						result += c + partExp;
@@ -444,8 +439,8 @@
 					else result += c;
 					break;
 				case '.':
-					if (info.DecimalPointPos == i) {
-						if (info.DecimalDigits > 0 && addInt) {
+					if (info.decimalPointPos == i) {
+						if (info.decimalDigits > 0 && addInt) {
 							result += partInt;
 							addInt = false;
 						}
@@ -480,20 +475,20 @@
 	function parse_custom_format(format) {
 
 		var info = {
-			UseGroup: false,
-			DecimalDigits: 0,
-			DecimalPointPos: -1,
-			DecimalTailSharpDigits: 0,
-			IntegerDigits: 0,
-			IntegerHeadSharpDigits: 0,
-			IntegerHeadPos: -1,
-			UseExponent: false,
-			ExponentDigits: 0,
-			ExponentTailSharpDigits: 0,
-			ExponentNegativeSignOnly: true,
-			DividePlaces: 0,
-			Percents: 0,
-			Permilles: 0
+			useGroup: false,
+			decimalDigits: 0,
+			decimalPointPos: -1,
+			decimalTailSharpDigits: 0,
+			integerDigits: 0,
+			integerHeadSharpDigits: 0,
+			integerHeadPos: -1,
+			useExponent: false,
+			exponentDigits: 0,
+			exponentTailSharpDigits: 0,
+			exponentNegativeSignOnly: true,
+			dividePlaces: 0,
+			percents: 0,
+			permilles: 0
 		};
 
 		var literal = '\0';
@@ -505,18 +500,18 @@
 		var length = format.length;
 
 		function inc_digits(){
-			if (info.IntegerHeadPos == -1)
-				info.IntegerHeadPos = i;
+			if (info.integerHeadPos == -1)
+				info.integerHeadPos = i;
 
 			if (integerArea) {
-				info.IntegerDigits++;
+				info.integerDigits++;
 				if (groupSeparatorCounter > 0)
-					info.UseGroup = true;
+					info.useGroup = true;
 				groupSeparatorCounter = 0;
 			} else if (decimalArea)
-				info.DecimalDigits++;
+				info.decimalDigits++;
 			else if (exponentArea)
-				info.ExponentDigits++;
+				info.exponentDigits++;
 		}
 
 		for (var i = 0; i < length; i++) {
@@ -530,7 +525,7 @@
 
 			if (exponentArea && (c != '\0' && c != '0' && c != '#')) {
 				exponentArea = false;
-				integerArea = (info.DecimalPointPos < 0);
+				integerArea = (info.decimalPointPos < 0);
 				decimalArea = !integerArea;
 				i--;
 				continue;
@@ -546,37 +541,37 @@
 					break;
 				case '#':
 					if (sharpContinues && integerArea)
-						info.IntegerHeadSharpDigits++;
+						info.integerHeadSharpDigits++;
 					else if (decimalArea)
-						info.DecimalTailSharpDigits++;
+						info.decimalTailSharpDigits++;
 					else if (exponentArea)
-						info.ExponentTailSharpDigits++;
+						info.exponentTailSharpDigits++;
 					inc_digits();
 					break;
 				case '0':
 					sharpContinues = false;
 					if (decimalArea)
-						info.DecimalTailSharpDigits = 0;
+						info.decimalTailSharpDigits = 0;
 					else if (exponentArea)
-						info.ExponentTailSharpDigits = 0;
+						info.exponentTailSharpDigits = 0;
 					inc_digits();
 					break;
 				case 'e':
 				case 'E':
-					if (info.UseExponent) break;
-					info.UseExponent = true;
+					if (info.useExponent) break;
+					info.useExponent = true;
 					integerArea = false;
 					decimalArea = false;
 					exponentArea = true;
 					if (i + 1 < length) {
 						var nc = format[i + 1];
 						if (nc == '+')
-							info.ExponentNegativeSignOnly = false;
+							info.exponentNegativeSignOnly = false;
 						if (nc == '+' || nc == '-')
 							i++;
 						else if (nc != '0' && nc != '#') {
-							info.UseExponent = false;
-							if (info.DecimalPointPos < 0)
+							info.useExponent = false;
+							if (info.decimalPointPos < 0)
 								integerArea = true;
 						}
 					}
@@ -585,46 +580,55 @@
 					integerArea = false;
 					decimalArea = true;
 					exponentArea = false;
-					if (info.DecimalPointPos == -1)
-						info.DecimalPointPos = i;
+					if (info.decimalPointPos == -1)
+						info.decimalPointPos = i;
 					break;
 				case '%':
-					info.Percents++;
+					info.percents++;
 					break;
 				case '\u2030':
-					info.Permilles++;
+					info.permilles++;
 					break;
 				case ',':
-					if (integerArea && info.IntegerDigits > 0)
+					if (integerArea && info.integerDigits > 0)
 						groupSeparatorCounter++;
 					break;
 			}
 		}
 
-		if (info.ExponentDigits === 0) {
-			info.UseExponent = false;
+		if (info.exponentDigits === 0) {
+			info.useExponent = false;
 		} else {
-			info.IntegerHeadSharpDigits = 0;
+			info.integerHeadSharpDigits = 0;
 		}
 
-		if (info.DecimalDigits === 0) {
-			info.DecimalPointPos = -1;
+		if (info.decimalDigits === 0) {
+			info.decimalPointPos = -1;
 		}
 
-		info.DividePlaces += groupSeparatorCounter * 3;
+		info.dividePlaces += groupSeparatorCounter * 3;
 
 		return info;
 	}
 
-	function parse_format_sections(value, format) {
+	function find_format_section(value, format) {
 
-		var index = [];
-		var start, end, section;
-		var literal = '\0';
+		var sections = [],
+			section,
+			literal = '\0',
+			zero = false,
+			negative = false,
+			start = 0;
 
-		for (start = 0; start < format.length; start++) {
+		if (value === 0) {
+			zero = true;
+		} else if (value < 0) {
+			negative = true;
+		}
 
-			var c = format.charAt(start);
+		for (var i = 0; i < format.length; i++) {
+
+			var c = format.charAt(i);
 
 			if (c == literal && c != '\0') {
 				literal = '\0';
@@ -640,65 +644,46 @@
 					literal = c;
 					break;
 				case '\\':
-					start++;
+					i++;
 					break;
 				case ';':
-					index.push(start);
-					break;
-			}
-		}
-
-		function getSection(i, j) {
-			start = index[i];
-			end = index[j];
-			if (format.charAt(start) == ';') start++;
-			if (format.charAt(end) == ';') end--;
-			return format.substring(start, end + 1);
-		}
-
-		var negative = false;
-		var zero = null;
-
-		if (index.length > 0) {
-			if (format.length - 1 > index[index.length - 1]) {
-				index.push(format.length - 1);
-			}
-			switch (index.length) {
-				case 1:
-					format = format.substr(0, index[0]);
-					break;
-				case 2:
-					if (value >= 0) {
-						format = format.substr(0, index[0]);
-					} else {
-						negative = true;
-						section = getSection(0, 1);
-						if (section.length === 0) {
-							section = format.substr(0, index[0]);
-							negative = false;
+					section = format.substring(start, i);
+					sections.push(section);
+					start = i + 1;
+					if (negative) {
+						if (sections.length > 1) {
+							return section ?
+								{ format: section, negative: true }
+								: { format: sections[0], negative: false };
 						}
-						format = section;
-					}
-					break;
-				// >= 3
-				default:
-					zero = getSection(1, 2);
-					if (value >= 0) {
-						format = format.substr(0, index[0]);
-					} else {
-						negative = true;
-						section = getSection(0, 1);
-						if (section.length === 0) {
-							section = format.substr(0, index[0]);
-							negative = false;
+					} else if (zero) {
+						if (sections.length > 2) {
+							return { format: section, negative: false };
 						}
-						format = section;
+					} else {
+						return { format: section, negative: false };
 					}
 					break;
 			}
 		}
 
-		return { format: format, zero: zero, negative: negative };
+		if (sections.length === 0) {
+			return { format: format, negative: false };
+		}
+
+		// last section
+		section = format.substring(start);
+		if (section) {
+			sections.push(section);
+		}
+
+		if (negative && sections.length > 1 && sections[1]) {
+			return { format: sections[1], negative: true };
+		} else if (zero && sections.length > 2) {
+			return { format: sections[2], negative: false };
+		}
+
+		return { format: sections[0], negative: false };
 	}
 
 	// Utilities
@@ -741,21 +726,7 @@
 		return n > 0 ? s + repeatz('0', n) : s;
 	}
 
-	function is_zero_only(s) {
-		return (/^0*$/).test(s);
-	}
-
-	// TODO optimize
-	function rtrim_zeros(s) {
-		var count = 0;
-		for (var i = s.length - 1; i >= 0; i--) {
-			if (s.charAt(i) != '0') break;
-			count++;
-		}
-		return count > 0 ? s.substr(0, s.length - count) : s;
-	}
-
-	function insertSep(s, sep, groupSize) {
+	function insert_sep(s, sep, groupSize) {
 		var i = s.length - (groupSize + 1);
 		while (i >= 0) {
 			s = s.substring(0, i + 1) + sep + s.substr(i + 1);
