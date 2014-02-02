@@ -1,6 +1,6 @@
 {
   "name": "format-number.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "format-number.js",
   "maintainers": [
     "Sergey Todyshev <stodyshev@gmail.com>"
