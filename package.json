@@ -1,6 +1,6 @@
 {
   "name": "format-number.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": ".NET style formatting of numbers implemented in JavaScript.",
   "license": "MIT",
   "main": "format-number.js",
